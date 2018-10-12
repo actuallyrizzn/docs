@@ -35,25 +35,6 @@
     "dockerfile": "docker-compose.yml"
   },
   "resources": [
-    {
-      "apiVersion": "[variables('apiVersionVirtualMachinesExtensions')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('dnsName'), '/newuserscript')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": [
-            "[uri(parameters('artifactsLocationUrl'), concat('scripts/configure.sh', parameters('artifactsLocationUrlSasToken')))]"
-          ]
-        },
-        "protectedSettings": {
-          "commandToExecute": "[concat('/bin/bash configure.sh \"', parameters('adminUsername'), '\" \"',parameters('artifactsLocationUrl'), '\" \"', parameters('artifactsLocationUrlSasToken'), '\" \"', parameters('networkId'), '\" \"', parameters('nodesCount'), '\" \"', parameters('initialBalance'), '\"')]"
-        }
-      }
-    }
+    
   ]
 }

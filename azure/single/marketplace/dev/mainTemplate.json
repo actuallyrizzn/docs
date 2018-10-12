@@ -52,22 +52,22 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D4s_v3",
+      "defaultValue": "Standard_D2s_v3",
       "metadata": {
         "description": "Size of the virtual machine used for nodes"
       }
-    },        
+    },
     "networkId": {
       "type": "string",
       "metadata": {
         "description": "Network identifier for the private gochain network"
-      }         
+      }
     },
     "initialBalance": {
-      "type": "string",        
+      "type": "string",
       "defaultValue": "1000000000",
       "metadata": {
-          "description": "Initial account balance for admin account in the private gochain network"
+        "description": "Initial account balance for admin account in the private gochain network"
       }
     },
     "nodesCount": {
@@ -140,8 +140,8 @@
     {
       "apiVersion": "[variables('apiVersionPublicIPAddresses')]",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('publicIpAddressName'),copyIndex())]",      
-      "location": "[parameters('location')]",      
+      "name": "[concat(variables('publicIpAddressName'),copyIndex())]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "addressLoop",
         "count": "[parameters('nodesCount')]"
@@ -261,7 +261,7 @@
       "name": "vmLinkedTemplate",
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vNet').name)]"        
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vNet').name)]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -303,50 +303,6 @@
           "location": {
             "value": "[parameters('location')]"
           }
-        }
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersionDeployments')]",
-      "name": "vmExtensionLinkedTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-        "vmLinkedTemplate"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[uri(parameters('_artifactsLocation'), concat('nested/VMExtension.json', parameters('_artifactsLocationSasToken')))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "authType": {
-            "value": "[parameters('authType')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "artifactsLocationURL": {
-            "value": "[parameters('_artifactsLocation')]"
-          },
-          "artifactsLocationUrlSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
-          },         
-          "networkId": {
-            "value": "[parameters('networkId')]"
-          },
-          "initialBalance": {
-            "value": "[parameters('initialBalance')]"
-          },          
-          "nodesCount": {
-            "value": "[parameters('nodesCount')]"
-          },          
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "dnsName": {
-            "value": "[variables('dnsName')]"
-          }          
         }
       }
     }
