@@ -129,7 +129,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersionVirtualMachinesExtensions')]",
+      "apiVersion": "[variables('apiVersionVirtualMachine')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(concat(parameters('dnsName'), copyIndex()), '/newuserscript')]",
       "location": "[parameters('location')]",
