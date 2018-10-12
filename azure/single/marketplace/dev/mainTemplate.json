@@ -275,6 +275,9 @@
           "nicName": {
             "value": "[variables('nicName')]"
           },
+          "nodesCount": {
+            "value": "[parameters('nodesCount')]"
+          },
           "vmSize": {
             "value": "[parameters('vmSize')]"
           },

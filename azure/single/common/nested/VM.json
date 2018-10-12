@@ -19,6 +19,13 @@
           "description": "Storage performance level for the Virtual Machine."
         }
       },
+      "nodesCount": {
+        "type": "int",
+        "defaultValue": 3,
+        "metadata": {
+          "description": "Number of nodes"
+        }
+      },
       "nicName": {
         "type": "string",
         "metadata": {
