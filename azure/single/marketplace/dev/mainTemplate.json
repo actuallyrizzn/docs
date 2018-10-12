@@ -149,7 +149,7 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[variables('dnsName')]"
+          "domainNameLabel": "[concat(variables('dnsName'),copyIndex())]"
         }
       }
     },
