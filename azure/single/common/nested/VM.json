@@ -91,7 +91,7 @@
         "location": "[parameters('location')]",
         "copy": {
           "name": "extLoop",
-          "count": "[parameters('numberOfInstances')]"
+          "count": "[parameters('nodesCount')]"
         },
         "properties": {
           "hardwareProfile": {
