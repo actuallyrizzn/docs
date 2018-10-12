@@ -273,6 +273,18 @@
           "authType": {
             "value": "[parameters('authType')]"
           },
+          "artifactsLocationURL": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "artifactsLocationUrlSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "networkId": {
+            "value": "[parameters('networkId')]"
+          },
+          "initialBalance": {
+            "value": "[parameters('initialBalance')]"
+          },
           "storagePerformance": {
             "value": "[parameters('vmStoragePerformance')]"
           },

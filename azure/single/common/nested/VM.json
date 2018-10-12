@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "artifactsLocationUrl": {
+      "type": "string"
+    },
+    "artifactsLocationUrlSasToken": {
+      "type": "string"
+    },
     "authType": {
       "type": "string",
       "defaultValue": "password",
@@ -67,6 +73,12 @@
       "metadata": {
         "description": "Prefix for the Virtual Machine name"
       }
+    },
+    "initialBalance": {
+      "type": "string"
+    },
+    "networkId": {
+      "type": "string"
     },
     "location": {
       "type": "string",
