@@ -122,7 +122,7 @@
           "networkProfile": {
             "networkInterfaces": [
               {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyindex()))]"
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicName'), copyindex()))]"
               }
             ]
           }
