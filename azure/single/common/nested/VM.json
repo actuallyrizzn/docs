@@ -104,8 +104,8 @@
           "hardwareProfile": {
             "vmSize": "[parameters('vmSize')]"
           },
-          "osProfile": {
-            "computerName": "[parameters('dnsName')]",
+          "osProfile": {            
+            "computerName": "[concat(parameters('dnsName'), copyIndex())]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPasswordOrKey')]",
             "linuxConfiguration": "[if(equals(parameters('authType'), 'password'), json('null'), variables('linuxConfiguration'))]"
