@@ -140,8 +140,12 @@
     {
       "apiVersion": "[variables('apiVersionPublicIPAddresses')]",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIpAddressName')]",
+      "name": "[concat(variables('publicIpAddressName'),copyIndex())]",      
       "location": "[parameters('location')]",      
+      "copy": {
+        "name": "addressLoop",
+        "count": "[parameters('nodesCount')]"
+      },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
@@ -160,7 +164,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('vNet').name)]",
-        "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+        "[concat('Microsoft.Network/publicIpAddresses/', concat(variables('publicIpAddressName'),copyIndex()))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
       ],
       "properties": {
@@ -173,7 +177,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIpAddressName'),copyIndex()))]"
               }
             }
           }
@@ -350,10 +354,5 @@
       }
     }
   ],
-  "outputs": {
-    "dnsName": {
-      "type": "string",
-      "value": "[reference(variables('publicIpAddressName')).dnsSettings.fqdn]"
-    } 
-  }
+  "outputs": {}
 }
