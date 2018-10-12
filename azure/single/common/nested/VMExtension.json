@@ -28,9 +28,6 @@
     },
     "dnsName": {
       "type": "string"
-    },
-    "fqdn": {
-      "type": "string"
     }
   },
   "variables": {
@@ -54,7 +51,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('/bin/bash configure.sh \"', parameters('adminUsername'), '\" \"',parameters('artifactsLocationUrl'), '\" \"', parameters('artifactsLocationUrlSasToken'), '\" \"', parameters('fqdn'), '\" \"', parameters('networkId'), '\" \"', parameters('nodesCount'), '\" \"', parameters('initialBalance'), '\"')]"
+          "commandToExecute": "[concat('/bin/bash configure.sh \"', parameters('adminUsername'), '\" \"',parameters('artifactsLocationUrl'), '\" \"', parameters('artifactsLocationUrlSasToken'), '\" \"', parameters('networkId'), '\" \"', parameters('nodesCount'), '\" \"', parameters('initialBalance'), '\"')]"
         }
       }
     }

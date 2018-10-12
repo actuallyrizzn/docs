@@ -346,10 +346,7 @@
           },
           "dnsName": {
             "value": "[variables('dnsName')]"
-          },
-          "fqdn": {
-            "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName')), variables('apiVersionPublicIPAddresses')).dnsSettings.fqdn]"
-          }
+          }          
         }
       }
     }
