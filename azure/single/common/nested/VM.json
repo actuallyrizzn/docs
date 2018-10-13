@@ -108,7 +108,7 @@
   },
   "resources": [
     {
-      "apiVersion": "[variables('apiVersionVirtualMachine')]",
+      "apiVersion": "[variables('apiVersionStorage')]",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('newStorageAccountName')]",
       "location": "[parameters('location')]",
@@ -117,7 +117,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersionStorage')]",
+      "apiVersion": "[variables('apiVersionVirtualMachine')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('nameInfix'),copyIndex())]",
       "location": "[parameters('location')]",
