@@ -88,6 +88,9 @@
     }
   },
   "variables": {
+    "vmStorageAccountContainerName": "vhds",
+    "newStorageAccountName": "[parameters('dnsName')]",
+    "OSDiskName": "[concat(parameters('dnsName'),'Disk')]",
     "apiVersionVirtualMachine": "2018-06-01",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "linuxConfiguration": {
@@ -105,9 +108,21 @@
   "resources": [
     {
       "apiVersion": "[variables('apiVersionVirtualMachine')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('newStorageAccountName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "accountType": "[concat(parameters('storagePerformance'), '_LRS')]"
+      }
+    },
+    {
+      "apiVersion": "[variables('apiVersionVirtualMachine')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('nameInfix'),copyIndex())]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/',variables('newStorageAccountName'))]"
+      ],
       "copy": {
         "name": "extLoop",
         "count": "[parameters('nodesCount')]"
@@ -137,6 +152,14 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicName'), copyindex()))]"
             }
           ]
+        },
+        "osDisk": {
+          "name": "osdisk",
+          "vhd": {
+            "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
+          },
+          "caching": "ReadWrite",
+          "createOption": "FromImage"
         }
       }
     },
