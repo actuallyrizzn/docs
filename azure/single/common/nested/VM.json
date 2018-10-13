@@ -92,7 +92,7 @@
     "newStorageAccountName": "[parameters('dnsName')]",
     "OSDiskName": "[concat(parameters('dnsName'),'Disk')]",
     "apiVersionVirtualMachine": "2018-06-01",
-    "apiVersionStorage": "2018-07-01",
+    "apiVersionStorage": "2015-06-15",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
