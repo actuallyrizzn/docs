@@ -146,9 +146,7 @@
           "imageReference": "[parameters('ubuntuImage')]",
           "osDisk": {
             "createOption": "FromImage",
-            "managedDisk": {
-              "storageAccountType": "[concat(parameters('storagePerformance'), '_LRS')]"
-            }
+            "name": "osdisk"
           },
           "dataDisks": [
             {
