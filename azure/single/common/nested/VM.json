@@ -154,6 +154,7 @@
           "dataDisks": [
             {
               "lun": 1,
+              "diskSizeGB": 1,
               "name": "shared",
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
