@@ -41,17 +41,6 @@ echo "accountName $STORAGE_ACCOUNT_NAME" > $HOMEDIR/fuse_connection.cfg
 echo "accountKey $STORAGE_ACCOUNT_KEY" >> $HOMEDIR/fuse_connection.cfg
 echo "containerName $STORAGE_CONTAINER_NAME" >> $HOMEDIR/fuse_connection.cfg
 
-###########################
-# Mounting fuse
-###########################
-
-chown $AZUREUSER:$AZUREUSER $HOMEDIR/fuse_connection.cfg
-chmod 700 $HOMEDIR/fuse_connection.cfg
-mkdir -p /mnt/resource/blobfusetmp
-chown $AZUREUSER:$AZUREUSER /mnt/resource/blobfusetmp
-mkdir $HOMEDIR/shared
-blobfuse $HOMEDIR/shared --tmp-path=/tmp/resource/blobfusetmp  --config-file=$HOMEDIR/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120
-
 
 ###########################
 # Copy asset files to home
@@ -73,6 +62,18 @@ sudo systemctl enable docker
 sleep 5
 sudo curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
+
+###########################
+# Mounting fuse
+###########################
+
+chown $AZUREUSER:$AZUREUSER $HOMEDIR/fuse_connection.cfg
+chmod 700 $HOMEDIR/fuse_connection.cfg
+mkdir -p /mnt/resource/blobfusetmp
+chown $AZUREUSER:$AZUREUSER /mnt/resource/blobfusetmp
+mkdir $HOMEDIR/shared
+chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
+nohup blobfuse $HOMEDIR/shared --tmp-path=/tmp/resource/blobfusetmp  --config-file=$HOMEDIR/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
