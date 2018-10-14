@@ -88,7 +88,7 @@
     }
   },
   "variables": {
-    "newStorageAccountName": "[parameters('dnsName')]",
+    "storageAccountName": "[parameters('dnsName')]",
     "apiVersionVirtualMachine": "2018-06-01",
     "containerName": "gochain-container",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
@@ -107,7 +107,7 @@
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('newStorageAccountName')]",
+      "name": "[variables('storageAccountName')]",
       "apiVersion": "2018-02-01",
       "location": "[parameters('location')]",
       "kind": "BlobStorage",
@@ -126,7 +126,7 @@
           "apiVersion": "2018-03-01-preview",
           "name": "[concat('default/', variables('containerName'))]",
           "dependsOn": [
-            "[variables('newStorageAccountName')]"
+            "[variables('storageAccountName')]"
           ],
           "properties": {
             "publicAccess": "None"
@@ -140,7 +140,7 @@
       "name": "[concat(parameters('nameInfix'),copyIndex())]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/',variables('newStorageAccountName'))]"
+        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
       ],
       "copy": {
         "name": "extLoop",
@@ -197,7 +197,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('/bin/bash configure.sh \"', parameters('adminUsername'), '\" \"',parameters('artifactsLocationUrl'), '\" \"', parameters('artifactsLocationUrlSasToken'), '\" \"', parameters('networkId'), '\" \"', parameters('nodesCount'), '\" \"', parameters('initialBalance'), '\"')]"
+          "commandToExecute": "[concat('/bin/bash configure.sh \"', parameters('adminUsername'), '\" \"',parameters('artifactsLocationUrl'), '\" \"', parameters('artifactsLocationUrlSasToken'), '\" \"', parameters('networkId'), '\" \"', parameters('nodesCount'), '\" \"', parameters('initialBalance'),'\" \"', parameters('dnsName'),'\" \"', variables('containerName'),'\" \"', listKeys(variables('storageAccountName'),'2017-10-01').keys[0].value, '\"')]"
         }
       }
     }
