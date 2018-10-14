@@ -121,7 +121,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersionVirtualMachine')]",
+      "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('nameInfix'),copyIndex())]",
       "location": "[parameters('location')]",
@@ -148,6 +148,7 @@
             "createOption": "FromImage",
             "name": "osdisk",
             "diskSizeGB": 1024,
+            "lun":0,
             "vhd": {
               "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'os.vhd')]"
             }
@@ -156,6 +157,7 @@
             {
               "diskSizeGB": 1,
               "name": "shared",
+              "lun":1,
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
               },
