@@ -8,6 +8,13 @@ ARTIFACTS_URL_PREFIX=$2
 ARTIFACTS_URL_SASTOKEN=$3
 NETWORK_ID=$4
 INITIAL_BALANCE=$5
+STORAGE_ACCOUNT_NAME=$6
+STORAGE_CONTAINER_NAME=$7
+STORAGE_ACCOUNT_KEY=$8
+
+echo "accountName $STORAGE_ACCOUNT_NAME" > $HOMEDIR/fuse_connection.cfg
+echo "accountKey $STORAGE_ACCOUNT_KEY" >> $HOMEDIR/fuse_connection.cfg
+echo "containerName $STORAGE_CONTAINER_NAME" >> $HOMEDIR/fuse_connection.cfg
 
 printf -v INITIAL_BALANCE_HEX "%x" "$INITIAL_BALANCE"
 printf -v CURRENT_TS_HEX "%x" $(date +%s)
