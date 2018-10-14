@@ -69,11 +69,11 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/fuse_connection.cfg
 chmod 700 $HOMEDIR/fuse_connection.cfg
-mkdir -p /mnt/resource/blobfusetmp
-chown $AZUREUSER:$AZUREUSER /mnt/resource/blobfusetmp
+mkdir -p /mnt/blobfusetmp
+chown $AZUREUSER:$AZUREUSER /mnt/blobfusetmp
 mkdir $HOMEDIR/shared
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
-nohup blobfuse $HOMEDIR/shared --tmp-path=/tmp/resource/blobfusetmp  --config-file=$HOMEDIR/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120
+sudo -H -u $AZUREUSER bash -c 'blobfuse /home/gochain/shared --tmp-path=/tmp/blobfusetmp  --config-file=/home/gochain/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120'
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
