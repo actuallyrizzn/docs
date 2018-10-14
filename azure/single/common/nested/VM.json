@@ -145,8 +145,6 @@
         "storageProfile": {
           "imageReference": "[parameters('ubuntuImage')]",
           "osDisk": {
-            "diskSizeGB": 100,
-            "lun": 0,
             "createOption": "FromImage",
             "name": "osdisk",
             "vhd": {
@@ -155,9 +153,8 @@
           },
           "dataDisks": [
             {
-              "diskSizeGB": 1,
-              "name": "shared",
               "lun": 1,
+              "name": "shared",
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
               },
