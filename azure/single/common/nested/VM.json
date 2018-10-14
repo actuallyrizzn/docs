@@ -148,7 +148,6 @@
             "createOption": "FromImage",
             "name": "osdisk",
             "diskSizeGB": 1024,
-            "lun": 0,
             "vhd": {
               "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'os.vhd')]"
             }
@@ -156,7 +155,6 @@
           "dataDisks": [
             {
               "diskSizeGB": 1,
-              "lun": 0,
               "name": "shared",
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
