@@ -108,10 +108,14 @@
   },
   "resources": [
     {
-      "apiVersion": "[variables('apiVersionStorage')]",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('newStorageAccountName')]",
+      "apiVersion": "[variables('apiVersionStorage')]",
       "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
       "properties": {
         "accountType": "[concat(parameters('storagePerformance'), '_LRS')]"
       }
@@ -148,11 +152,13 @@
           },
           "dataDisks": [
             {
+              "diskSizeGB": 1023,
+              "lun": 0,
               "name": "shared",
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
-              },              
-              "createOption": "Attach"
+              },
+              "createOption": "Empty"
             }
           ]
         },
