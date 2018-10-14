@@ -145,8 +145,10 @@
         "storageProfile": {
           "imageReference": "[parameters('ubuntuImage')]",
           "osDisk": {
+            "diskSizeGB": 100,
+            "lun": 0,
             "createOption": "FromImage",
-            "name": "osdisk",            
+            "name": "osdisk",
             "vhd": {
               "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'os.vhd')]"
             }
@@ -155,7 +157,7 @@
             {
               "diskSizeGB": 1,
               "name": "shared",
-              "lun":1,
+              "lun": 1,
               "vhd": {
                 "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
               },
