@@ -32,7 +32,7 @@ CONFIG_LOG_FILE_PATH="$HOMEDIR/config.log";
 # Use the default user
 #############
 cd "/home/$AZUREUSER";
-
+echo "$@" >> $HOMEDIR/all.params
 ###########################
 # Prepare fuse config
 ###########################
@@ -40,7 +40,18 @@ cd "/home/$AZUREUSER";
 echo "accountName $STORAGE_ACCOUNT_NAME" > $HOMEDIR/fuse_connection.cfg
 echo "accountKey $STORAGE_ACCOUNT_KEY" >> $HOMEDIR/fuse_connection.cfg
 echo "containerName $STORAGE_CONTAINER_NAME" >> $HOMEDIR/fuse_connection.cfg
-echo "$@" >> $HOMEDIR/all.params
+
+###########################
+# Mounting fuse
+###########################
+
+chown $AZUREUSER:$AZUREUSER $HOMEDIR/fuse_connection.cfg
+chmod 700 $HOMEDIR/fuse_connection.cfg
+mkdir -p /mnt/resource/blobfusetmp
+chown $AZUREUSER:$AZUREUSER /mnt/resource/blobfusetmp
+mkdir $HOMEDIR/shared
+blobfuse $HOMEDIR/shared --tmp-path=/tmp/resource/blobfusetmp  --config-file=$HOMEDIR/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120
+
 
 ###########################
 # Copy asset files to home
@@ -51,7 +62,7 @@ curl -L ${ARTIFACTS_URL_ROOT}/scripts/genesis${ARTIFACTS_URL_SASTOKEN} -o $HOMED
 #########################################
 # Install docker and compose on all nodes
 #########################################
-wget https://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb
+wget https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
