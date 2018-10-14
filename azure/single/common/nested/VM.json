@@ -146,9 +146,7 @@
           "imageReference": "[parameters('ubuntuImage')]",
           "osDisk": {
             "createOption": "FromImage",
-            "name": "osdisk",
-            "diskSizeGB": 1024,
-            "lun":0,
+            "name": "osdisk",            
             "vhd": {
               "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'os.vhd')]"
             }
