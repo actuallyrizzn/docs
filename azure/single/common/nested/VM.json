@@ -88,11 +88,9 @@
     }
   },
   "variables": {
-    "vmStorageAccountContainerName": "vhds",
     "newStorageAccountName": "[parameters('dnsName')]",
-    "OSDiskName": "[concat(parameters('dnsName'),'Disk')]",
     "apiVersionVirtualMachine": "2018-06-01",
-    "apiVersionStorage": "2015-06-15",
+    "containerName": "gochain-container",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
@@ -110,15 +108,28 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('newStorageAccountName')]",
-      "apiVersion": "[variables('apiVersionStorage')]",
+      "apiVersion": "2018-02-01",
       "location": "[parameters('location')]",
+      "kind": "BlobStorage",
       "sku": {
-        "name": "Standard_LRS"
+        "name": "Standard_LRS",
+        "tier": "Standard"
       },
-      "kind": "Storage",
+      "tags": {},
+      "dependsOn": [],
       "properties": {
-        "accountType": "[concat(parameters('storagePerformance'), '_LRS')]"
-      }
+        "accessTier": "Cool"
+      },
+      "resources": [
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-03-01-preview",
+          "name": "[concat('default/', variables('containerName'))]",
+          "properties": {
+            "publicAccess": "None"
+          }
+        }
+      ]
     },
     {
       "apiVersion": "2015-05-01-preview",
@@ -146,22 +157,10 @@
           "imageReference": "[parameters('ubuntuImage')]",
           "osDisk": {
             "createOption": "FromImage",
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'os.vhd')]"
+            "managedDisk": {
+              "storageAccountType": "[concat(parameters('storagePerformance'), '_LRS')]"
             }
-          },
-          "dataDisks": [
-            {
-              "lun": 1,
-              "diskSizeGB": 1,
-              "name": "shared",
-              "vhd": {
-                "uri": "[concat('http://',variables('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'db.vhd')]"
-              },
-              "createOption": "Empty"
-            }
-          ]
+          }
         },
         "networkProfile": {
           "networkInterfaces": [
