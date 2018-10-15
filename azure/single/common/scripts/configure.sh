@@ -89,9 +89,13 @@ echo "$ACCOUNT_ID" > $HOMEDIR/${ACCOUNT_ID}.account
 echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
 ENODE=${ENODE_OUTPUT:0:137}
+
 echo "$ENODE" > $HOMEDIR/${ACCOUNT_ID}.enode
 sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.account ${HOMEDIR}/shared"
 sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.enode ${HOMEDIR}/shared"
+
+sudo -H -u $AZUREUSER bash -c "'${ENODE}' ${HOMEDIR}/shared/enodes"
+sudo -H -u $AZUREUSER bash -c "'${ACCOUNT_ID}' ${HOMEDIR}/shared/accounts"
 ###########################
 # Generate genesis
 ###########################
