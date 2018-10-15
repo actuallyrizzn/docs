@@ -85,6 +85,7 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 # Share configs
 ###########################
+sleep 5 #wait until blobfuse attachs share
 echo "$ACCOUNT_ID" > $HOMEDIR/shared/${ACCOUNT_ID}.account
 echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
