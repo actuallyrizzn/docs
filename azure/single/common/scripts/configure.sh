@@ -94,8 +94,8 @@ echo "$ENODE" > $HOMEDIR/${ACCOUNT_ID}.enode
 sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.account ${HOMEDIR}/shared"
 sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.enode ${HOMEDIR}/shared"
 
-sudo -H -u $AZUREUSER bash -c "'${ENODE}' ${HOMEDIR}/shared/enodes"
-sudo -H -u $AZUREUSER bash -c "'${ACCOUNT_ID}' ${HOMEDIR}/shared/accounts"
+sudo -H -u $AZUREUSER bash -c "echo '${ENODE}' >> ${HOMEDIR}/shared/enodes"
+sudo -H -u $AZUREUSER bash -c "echo '${ACCOUNT_ID}' >> ${HOMEDIR}/shared/accounts"
 ###########################
 # Generate genesis
 ###########################
