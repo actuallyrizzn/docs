@@ -85,11 +85,11 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 # Share configs
 ###########################
-
-touch $HOMEDIR/shared/${ACCOUNT_ID}.account
-echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/enode.js
-docker run -v ${$HOMEDIR}:${$HOMEDIR} gochain/gochain --datadir ${$HOMEDIR}/node js ${$HOMEDIR}/enode.js
-
+echo "$ACCOUNT_ID" > $HOMEDIR/shared/${ACCOUNT_ID}.account
+echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
+ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
+ENODE=${ENODE_OUTPUT:0:137}
+echo "$ENODE" > $HOMEDIR/shared/${ENODE}.enode
 ###########################
 # Generate genesis
 ###########################
@@ -103,7 +103,7 @@ sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
 mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 
-# sudo sudo rm -rf $PWD/node/GoChain
+# sudo rm -rf $PWD/node/GoChain
 # sudo docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
 # #########################################
 # # Install docker image from private repo
