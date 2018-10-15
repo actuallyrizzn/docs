@@ -73,7 +73,7 @@ mkdir -p /mnt/blobfusetmp
 chown $AZUREUSER:$AZUREUSER /mnt/blobfusetmp
 mkdir $HOMEDIR/shared
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
-sudo -H -u $AZUREUSER bash -c 'blobfuse /home/gochain/shared --tmp-path=/tmp/blobfusetmp  --config-file=/home/gochain/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120'
+sudo -H -u $AZUREUSER bash -c 'blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120'
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
@@ -85,12 +85,13 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 # Share configs
 ###########################
-sleep 5 #wait until blobfuse attachs share
-echo "$ACCOUNT_ID" > $HOMEDIR/shared/${ACCOUNT_ID}.account
+echo "$ACCOUNT_ID" > $HOMEDIR/${ACCOUNT_ID}.account
 echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
 ENODE=${ENODE_OUTPUT:0:137}
-echo "$ENODE" > $HOMEDIR/shared/${ENODE}.enode
+echo "$ENODE" > $HOMEDIR/${ACCOUNT_ID}.enode
+sudo -H -u $AZUREUSER bash -c 'mv ${HOMEDIR}/*.account ${HOMEDIR}/shared'
+sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.enode ${HOMEDIR}/shared"
 ###########################
 # Generate genesis
 ###########################
@@ -105,8 +106,8 @@ sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 
 # sudo rm -rf $PWD/node/GoChain
-# sudo docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
+# docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
 # #########################################
 # # Install docker image from private repo
 # #########################################
-# sudo docker-compose up -d
+# docker-compose up -d
