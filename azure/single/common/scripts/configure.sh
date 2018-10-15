@@ -73,7 +73,7 @@ mkdir -p /mnt/blobfusetmp
 chown $AZUREUSER:$AZUREUSER /mnt/blobfusetmp
 mkdir $HOMEDIR/shared
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
-sudo -H -u $AZUREUSER bash -c 'blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120'
+sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120"
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
@@ -90,7 +90,7 @@ echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
 ENODE=${ENODE_OUTPUT:0:137}
 echo "$ENODE" > $HOMEDIR/${ACCOUNT_ID}.enode
-sudo -H -u $AZUREUSER bash -c 'mv ${HOMEDIR}/*.account ${HOMEDIR}/shared'
+sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.account ${HOMEDIR}/shared"
 sudo -H -u $AZUREUSER bash -c "mv ${HOMEDIR}/*.enode ${HOMEDIR}/shared"
 ###########################
 # Generate genesis
