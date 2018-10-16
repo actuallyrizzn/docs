@@ -83,26 +83,35 @@ echo "GOCHAIN_ACCT=0x$ACCOUNT_ID" > $HOMEDIR/.env
 echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 
 ###########################
-# Share configs
+# Exchange configs
 ###########################
+
 echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
 ENODE=${ENODE_OUTPUT:0:137}
+IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
+sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/enodes"
+sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/accounts"
 
-sudo -H -u $AZUREUSER bash -c "echo '${ENODE}' >> ${HOMEDIR}/shared/enodes"
-sudo -H -u $AZUREUSER bash -c "echo '${ACCOUNT_ID}' >> ${HOMEDIR}/shared/accounts"
 ###########################
 # Generate genesis
 ###########################
-
+ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
-sed -i "s/#SIGNERADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
-sed -i "s/#VOTERADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
+sed -i "s/#ADDRESSES/$ADDRESSES/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#ADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
 mv $HOMEDIR/genesis $HOMEDIR/genesis.json
+
+###########################
+# Generate config
+###########################
+ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
+sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
+sed -i "s/#NODES/$ENODES/g" $HOMEDIR/config || exit 1;
+mv $HOMEDIR/config $HOMEDIR/config.toml
 
 # sudo rm -rf $PWD/node/GoChain
 # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
