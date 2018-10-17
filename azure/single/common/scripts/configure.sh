@@ -100,9 +100,11 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 sleep 30
 
 ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
+ADDRESSES=${ADDRESSES%?}; # remove last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
-sed -i "s/#ADDRESSES/${ADDRESSES//[$'\t\r\n']}/g" $HOMEDIR/genesis || exit 1;
+# perl -i.bak -pe 's/#ADDRESSES/'"${ADDRESSES}"'/g' $HOMEDIR/genesis || exit 1;
+echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
 sed -i "s/#ADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
@@ -112,11 +114,12 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # # Generate config
 # ###########################
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
+ENODES=${ENODES%?}; # remove last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
-sed -i "s~#NODES~${ENODES//[$'\t\r\n']}~g" $HOMEDIR/config
+echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
 
-# # sudo rm -rf $PWD/node/GoChain
+sudo rm -rf $PWD/node/GoChain
 # # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
 # # #########################################
 # # # Install docker image from private repo
