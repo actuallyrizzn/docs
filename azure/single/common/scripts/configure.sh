@@ -110,9 +110,10 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # Generate config
 ###########################
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
-sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
-sed -i "s/#NODES/$ENODES/g" $HOMEDIR/config || exit 1;
-mv $HOMEDIR/config $HOMEDIR/config.toml
+printenv > $HOMEDIR/env.txt
+# sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
+# sed -i "s/#NODES/$ENODES/g" $HOMEDIR/config || exit 1;
+# mv $HOMEDIR/config $HOMEDIR/config.toml
 
 # sudo rm -rf $PWD/node/GoChain
 # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
