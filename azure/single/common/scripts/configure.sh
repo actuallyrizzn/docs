@@ -74,7 +74,7 @@ mkdir -p /mnt/blobfusetmp
 chown $AZUREUSER:$AZUREUSER /mnt/blobfusetmp
 mkdir $HOMEDIR/shared
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
-sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=240 -o entry_timeout=240 -o negative_timeout=120"
+sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=10 -o entry_timeout=10 -o negative_timeout=10"
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
@@ -97,6 +97,7 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 # ###########################
 # # Generate genesis
 # ###########################
+sleep 30
 ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
@@ -111,7 +112,7 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # ###########################
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
-sed -i "s/#NODES/${ENODES//[$'\t\r\n']}/g" $HOMEDIR/config || exit 1;
+sed -i "s~#NODES~${ENODES//[$'\t\r\n']}~g" $HOMEDIR/config
 mv $HOMEDIR/config $HOMEDIR/config.toml
 
 # # sudo rm -rf $PWD/node/GoChain
