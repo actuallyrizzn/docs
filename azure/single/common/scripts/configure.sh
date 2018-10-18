@@ -96,13 +96,15 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 # ###########################
 # # Generate genesis
 # ###########################
-file="${HOMEDIR}/shared/accounts"
-while sleep 10
+COUNTER=0
+while sleep 10 && [ "$COUNTER" -lt 18 ] #wait for no more than 3 minutes
 do
-    size=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
-    if [ "$size" -ge "$NODES_COUNT" ]; then
+    SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
+    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER}"
+    if [ "$SIZE" -ge "$NODES_COUNT" ]; then
         break;
     fi
+    COUNTER=$[$COUNTER +1]
 done
 
 
