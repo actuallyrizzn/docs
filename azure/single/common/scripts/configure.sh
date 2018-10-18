@@ -108,7 +108,7 @@ COUNTER=0
 while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
 do
     SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
-    FILES=$(sudo -H -u $AZUREUSER bash -c "ls * | wc -l")
+    FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/* | wc -l")
     echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER} files ${FILES}" >> ${HOMEDIR}/output.log
     if [ "$SIZE" -ge "$NODES_COUNT" ]; then
         echo "Found 3 lines" >> ${HOMEDIR}/output.log
