@@ -115,7 +115,7 @@ ADDRESS=${ADDRESS%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
-sed -i "s/#ADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
+sed -i "s/#ADDRESS/$ADDRESS/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
 mv $HOMEDIR/genesis $HOMEDIR/genesis.json
@@ -129,9 +129,9 @@ sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
 
-# sudo rm -rf $PWD/node/GoChain
-# # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
-# # #########################################
-# # # Install docker image from private repo
-# # #########################################
-# # docker-compose up -d
+sudo rm -rf $PWD/node/GoChain
+docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
+#########################################
+# Install docker image from private repo
+#########################################
+docker-compose up -d
