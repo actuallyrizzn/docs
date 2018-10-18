@@ -98,6 +98,7 @@ IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep 
 sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/enodes"
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/accounts"
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.account"
+sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
 
 ############################
 ## Syncing
@@ -108,23 +109,21 @@ COUNTER=0
 while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
 do
     SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
-    FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/* | wc -l")
+    FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/*.account | wc -l")
     echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER} files ${FILES}" >> ${HOMEDIR}/output.log
-    if [ "$SIZE" -ge "$NODES_COUNT" ]; then
-        echo "Found 3 lines" >> ${HOMEDIR}/output.log
+    if [ "$FILES" -ge "$NODES_COUNT" ]; then
+        echo "Found 3 files" >> ${HOMEDIR}/output.log
         break;
     fi
     COUNTER=$[$COUNTER +1]
 done
-
-sleep 10
 
 ############################
 ## Generate genesis
 ############################
 
 echo "Generating genesis: $(date)" >> ${HOMEDIR}/output.log
-ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
+ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.account")
 ADDRESSES=${ADDRESSES%?}; # remove the last character
 echo "Addresses ${ADDRESSES}" >> ${HOMEDIR}/output.log
 ADDRESS=(${ADDRESSES[@]});#get the first address from the list
@@ -142,7 +141,7 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # # Generate config
 # ###########################
 echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
-ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
+ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
 ENODES=${ENODES%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
