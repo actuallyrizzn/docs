@@ -95,8 +95,6 @@ echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
 ENODE=${ENODE_OUTPUT:0:137}
 IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
-sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/enodes"
-sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/accounts"
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.account"
 sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
 
@@ -108,11 +106,9 @@ echo "Waiting for the configs: $(date)" >> ${HOMEDIR}/output.log
 COUNTER=0
 while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
 do
-    SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
     FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/*.account | wc -l")
-    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER} files ${FILES}" >> ${HOMEDIR}/output.log
-    if [ "$FILES" -ge "$NODES_COUNT" ]; then
-        echo "Found 3 files" >> ${HOMEDIR}/output.log
+    echo "Nodes count ${NODES_COUNT} files ${FILES} counter ${COUNTER} " >> ${HOMEDIR}/output.log
+    if [ "$FILES" -ge "$NODES_COUNT" ]; then        
         break;
     fi
     COUNTER=$[$COUNTER +1]
@@ -129,6 +125,7 @@ echo "Addresses ${ADDRESSES}" >> ${HOMEDIR}/output.log
 ADDRESS=(${ADDRESSES[@]});#get the first address from the list
 ADDRESS=${ADDRESS%?}; # remove the last character
 echo "Address ${ADDRESS}" >> ${HOMEDIR}/output.log
+
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
@@ -147,9 +144,9 @@ sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
 
-sudo rm -rf $PWD/node/GoChain
-docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
-#########################################
-# Install docker image from private repo
-#########################################
-docker-compose up -d
+# sudo rm -rf $PWD/node/GoChain
+# docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
+# #########################################
+# # Install docker image from private repo
+# #########################################
+# docker-compose up -d
