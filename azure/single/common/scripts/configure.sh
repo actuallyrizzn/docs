@@ -26,7 +26,6 @@ ARTIFACTS_URL_ROOT=${ARTIFACTS_URL_PREFIX%\/*}
 # Constants
 ###########
 HOMEDIR="/home/$AZUREUSER";
-CONFIG_LOG_FILE_PATH="$HOMEDIR/config.log";
 
 #############
 # Use the default user
@@ -97,13 +96,22 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 # ###########################
 # # Generate genesis
 # ###########################
-sleep 60
+file="${HOMEDIR}/shared/accounts"
+while sleep 10
+do
+    size=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
+    if [ "$size" -ge "$NODES_COUNT" ]; then
+        break;
+    fi
+done
+
 
 ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
-ADDRESSES=${ADDRESSES%?}; # remove last character
+ADDRESSES=${ADDRESSES%?}; # remove the last character
+ADDRESS=(${ADDRESSES[@]});#get the first address from the list
+ADDRESS=${ADDRESS%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
-# perl -i.bak -pe 's/#ADDRESSES/'"${ADDRESSES}"'/g' $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
 sed -i "s/#ADDRESS/$ACCOUNT_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
@@ -114,7 +122,7 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # # Generate config
 # ###########################
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
-ENODES=${ENODES%?}; # remove last character
+ENODES=${ENODES%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
