@@ -32,6 +32,7 @@ HOMEDIR="/home/$AZUREUSER";
 #############
 cd "/home/$AZUREUSER";
 echo "$@" >> $HOMEDIR/all.params
+echo "Start time: $(date)" >> ${HOMEDIR}/output.log
 ###########################
 # Prepare fuse config
 ###########################
@@ -44,6 +45,7 @@ echo "containerName $STORAGE_CONTAINER_NAME" >> $HOMEDIR/fuse_connection.cfg
 ###########################
 # Copy asset files to home
 ###########################
+echo "Downloading everything: $(date)" >> ${HOMEDIR}/output.log
 curl -L ${ARTIFACTS_URL_ROOT}/scripts/docker-compose.yml${ARTIFACTS_URL_SASTOKEN} -o $HOMEDIR/docker-compose.yml
 curl -L ${ARTIFACTS_URL_ROOT}/scripts/genesis${ARTIFACTS_URL_SASTOKEN} -o $HOMEDIR/genesis
 curl -L ${ARTIFACTS_URL_ROOT}/scripts/config${ARTIFACTS_URL_SASTOKEN} -o $HOMEDIR/config
@@ -51,6 +53,7 @@ curl -L ${ARTIFACTS_URL_ROOT}/scripts/config${ARTIFACTS_URL_SASTOKEN} -o $HOMEDI
 #########################################
 # Install docker and compose on all nodes
 #########################################
+echo "Installing docker,blobfuse: $(date)" >> ${HOMEDIR}/output.log
 wget https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -66,7 +69,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ###########################
 # Mounting fuse
 ###########################
-
+echo "Mounting fuse: $(date)" >> ${HOMEDIR}/output.log
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/fuse_connection.cfg
 chmod 700 $HOMEDIR/fuse_connection.cfg
 mkdir -p /mnt/blobfusetmp
@@ -76,6 +79,7 @@ chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
 sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg"
 
 #########################################
+echo "Generating account: $(date)" >> ${HOMEDIR}/output.log
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
 ACCOUNT_ID=$(sudo docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node --password /root/password.txt account new | awk -F '[{}]' '{print $2}')
 
@@ -85,6 +89,7 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 # Exchange configs
 ###########################
+echo "Writing configs: $(date)" >> ${HOMEDIR}/output.log
 
 echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
 ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
@@ -93,9 +98,11 @@ IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep 
 sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/enodes"
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/accounts"
 
-# ###########################
-# # Generate genesis
-# ###########################
+############################
+## Syncing
+############################
+
+echo "Waiting for the configs: $(date)" >> ${HOMEDIR}/output.log
 COUNTER=0
 while sleep 10 && [ "$COUNTER" -lt 60 ] #wait for no more than 10 minutes
 do
@@ -110,17 +117,17 @@ done
 
 sleep 10
 
+############################
+## Generate genesis
+############################
+
+echo "Generating genesis: $(date)" >> ${HOMEDIR}/output.log
 ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
 ADDRESSES=${ADDRESSES%?}; # remove the last character
-
 echo "Addresses ${ADDRESSES}" >> ${HOMEDIR}/output.log
-
-
 ADDRESS=(${ADDRESSES[@]});#get the first address from the list
 ADDRESS=${ADDRESS%?}; # remove the last character
-
 echo "Address ${ADDRESS}" >> ${HOMEDIR}/output.log
-
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
@@ -132,6 +139,7 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # ###########################
 # # Generate config
 # ###########################
+echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/enodes")
 ENODES=${ENODES%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
