@@ -100,7 +100,7 @@ COUNTER=0
 while sleep 10 && [ "$COUNTER" -lt 60 ] #wait for no more than 10 minutes
 do
     SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
-    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER}"
+    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER}" >> ${HOMEDIR}/output.log
     if [ "$SIZE" -ge "$NODES_COUNT" ]; then
         echo "Found 3 lines" >> ${HOMEDIR}/output.log
         break;
@@ -114,10 +114,13 @@ ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
 ADDRESSES=${ADDRESSES%?}; # remove the last character
 
 echo "Addresses ${ADDRESSES}" >> ${HOMEDIR}/output.log
-echo "Address ${ADDRESS}" >> ${HOMEDIR}/output.log
+
 
 ADDRESS=(${ADDRESSES[@]});#get the first address from the list
 ADDRESS=${ADDRESS%?}; # remove the last character
+
+echo "Address ${ADDRESS}" >> ${HOMEDIR}/output.log
+
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
