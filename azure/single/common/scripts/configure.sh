@@ -97,6 +97,7 @@ ENODE=${ENODE_OUTPUT:0:137}
 IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
 sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/enodes"
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/accounts"
+sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.account"
 
 ############################
 ## Syncing
@@ -104,10 +105,11 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 
 echo "Waiting for the configs: $(date)" >> ${HOMEDIR}/output.log
 COUNTER=0
-while sleep 10 && [ "$COUNTER" -lt 60 ] #wait for no more than 10 minutes
+while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
 do
     SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
-    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER}" >> ${HOMEDIR}/output.log
+    FILES=$(sudo -H -u $AZUREUSER bash -c "ls * | wc -l")
+    echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER} files ${FILES}" >> ${HOMEDIR}/output.log
     if [ "$SIZE" -ge "$NODES_COUNT" ]; then
         echo "Found 3 lines" >> ${HOMEDIR}/output.log
         break;
