@@ -97,7 +97,7 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 # ###########################
 # # Generate genesis
 # ###########################
-sleep 30
+sleep 60
 
 ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/accounts")
 ADDRESSES=${ADDRESSES%?}; # remove last character
