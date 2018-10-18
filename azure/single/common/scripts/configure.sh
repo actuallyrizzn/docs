@@ -91,12 +91,13 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 echo "Writing configs: $(date)" >> ${HOMEDIR}/output.log
 
-echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
-ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
-ENODE=${ENODE_OUTPUT:0:137}
-IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
+# echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
+# ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
+# ENODE=${ENODE_OUTPUT:0:137}
+# IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.account"
-sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
+# sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
+# echo "Enode:${ENODE}" >> ${HOMEDIR}/output.log
 
 ############################
 ## Syncing
@@ -137,12 +138,13 @@ mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 # ###########################
 # # Generate config
 # ###########################
-echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
-ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
-ENODES=${ENODES%?}; # remove the last character
-sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
-echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
-mv $HOMEDIR/config $HOMEDIR/config.toml
+
+# echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
+# ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
+# ENODES=${ENODES%?}; # remove the last character
+# sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
+# echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
+# mv $HOMEDIR/config $HOMEDIR/config.toml
 
 # sudo rm -rf $PWD/node/GoChain
 # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
