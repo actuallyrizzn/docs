@@ -119,7 +119,7 @@ sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
 
-sudo rm -rf $PWD/node/GoChain
+# sudo rm -rf $PWD/node/GoChain
 # # docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
 # # #########################################
 # # # Install docker image from private repo
