@@ -73,7 +73,7 @@ mkdir -p /mnt/blobfusetmp
 chown $AZUREUSER:$AZUREUSER /mnt/blobfusetmp
 mkdir $HOMEDIR/shared
 chown $AZUREUSER:$AZUREUSER $HOMEDIR/shared
-sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg -o attr_timeout=10 -o entry_timeout=10 -o negative_timeout=10"
+sudo -H -u $AZUREUSER bash -c "blobfuse ${HOMEDIR}/shared --tmp-path=/tmp/blobfusetmp  --config-file=${HOMEDIR}/fuse_connection.cfg"
 
 #########################################
 date +%s | sha256sum | base64 | head -c 32 > $HOMEDIR/password.txt
@@ -97,7 +97,7 @@ sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/sha
 # # Generate genesis
 # ###########################
 COUNTER=0
-while sleep 10 && [ "$COUNTER" -lt 18 ] #wait for no more than 3 minutes
+while sleep 10 && [ "$COUNTER" -lt 60 ] #wait for no more than 10 minutes
 do
     SIZE=$(sudo -H -u $AZUREUSER bash -c "wc -l < ${HOMEDIR}/shared/accounts")
     echo "Number of accounts ${SIZE} nodes count ${NODES_COUNT} counter ${COUNTER}"
