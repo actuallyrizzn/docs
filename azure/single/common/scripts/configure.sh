@@ -30,7 +30,6 @@ STORAGE_ACCOUNT_KEY=$9
 
 
 printf -v INITIAL_BALANCE_HEX "%x" "$INITIAL_BALANCE"
-printf -v CURRENT_TS_HEX "%x" $(date +%s)
 
 ######################
 # URL parsing (root)
@@ -121,7 +120,6 @@ ACCOUNT=${ACCOUNT%?}; # remove the last character
 echo "ACCOUNT ${ACCOUNT}" >> ${HOMEDIR}/output.log
 
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
-sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
 echo "$(awk -v  r="${ACCOUNT}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis #write only first account here
 sed -i "s/#ACCOUNT/$ACCOUNT/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
