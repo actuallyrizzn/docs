@@ -9,7 +9,7 @@ services:
       - "30303:30303/udp"
     volumes:
       - .:/gochain
-    command: gochain --networkid ${GOCHAIN_NETWORK} --rpc --rpcaddr 0.0.0.0 --nodiscover --datadir /gochain/node --cache ${GOCHAIN_CACHE:-1024} --mine --unlock ${GOCHAIN_ACCT} --password /gochain/password.txt
+    command: gochain --networkid ${GOCHAIN_NETWORK} --config /gochain/config.toml --rpc --rpcaddr 0.0.0.0 --nodiscover --datadir /gochain/node --cache ${GOCHAIN_CACHE:-1024} --mine --unlock ${GOCHAIN_ACCT} --password /gochain/password.txt
     restart: always
   watchtower:
     container_name: watchtower
