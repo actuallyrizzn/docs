@@ -158,4 +158,4 @@ mv $HOMEDIR/config $HOMEDIR/config.toml
 # #########################################
 # # Install docker image from private repo
 # #########################################
-# docker-compose up -d
+docker-compose up -d
