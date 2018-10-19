@@ -5,7 +5,7 @@ NetworkId = #NETWORKID
 NoLocals = true
 
 [Node]
-DataDir = "/root/node"
+DataDir = "/gochain/node"
 HTTPModules = ["net", "web3", "eth", "shh"]
 WSModules = ["net", "web3", "eth", "shh"]
 
