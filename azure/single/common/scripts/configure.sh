@@ -1,4 +1,19 @@
 #!/bin/bash
+# Functions
+wait_for_files () {
+    echo "Waiting for the files with extension ${1}: $(date)" >> ${HOMEDIR}/output.log
+    COUNTER=0
+    while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
+    do
+        FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/*.${1} | wc -l")
+        echo "Nodes count ${NODES_COUNT} files ${FILES} counter ${COUNTER} " >> ${HOMEDIR}/output.log
+        if [ "$FILES" -ge "$NODES_COUNT" ]; then
+            break;
+        fi
+        COUNTER=$[$COUNTER +1]
+    done
+    
+}
 
 #############
 # Parameters
@@ -89,65 +104,57 @@ echo "GOCHAIN_NETWORK=$NETWORK_ID" >> $HOMEDIR/.env
 ###########################
 # Exchange configs
 ###########################
-echo "Writing configs: $(date)" >> ${HOMEDIR}/output.log
-
-# echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
-# ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
-# ENODE=${ENODE_OUTPUT:0:137}
-# IP_ADDRESS=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
+echo "Writing accounts: $(date)" >> ${HOMEDIR}/output.log
 sudo -H -u $AZUREUSER bash -c "echo '    \"0x${ACCOUNT_ID}\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.account"
-# sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ADDRESS}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
-# echo "Enode:${ENODE}" >> ${HOMEDIR}/output.log
-
-############################
-## Syncing
-############################
-
-echo "Waiting for the configs: $(date)" >> ${HOMEDIR}/output.log
-COUNTER=0
-while sleep 10 && [ "$COUNTER" -lt 6 ] #wait for no more than 1 minute
-do
-    FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/*.account | wc -l")
-    echo "Nodes count ${NODES_COUNT} files ${FILES} counter ${COUNTER} " >> ${HOMEDIR}/output.log
-    if [ "$FILES" -ge "$NODES_COUNT" ]; then        
-        break;
-    fi
-    COUNTER=$[$COUNTER +1]
-done
+wait_for_files "account" #wait for files with extension *.account
 
 ############################
 ## Generate genesis
 ############################
 
 echo "Generating genesis: $(date)" >> ${HOMEDIR}/output.log
-ADDRESSES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.account")
-ADDRESSES=${ADDRESSES%?}; # remove the last character
-echo "Addresses ${ADDRESSES}" >> ${HOMEDIR}/output.log
-ADDRESS=(${ADDRESSES[@]});#get the first address from the list
-ADDRESS=${ADDRESS%?}; # remove the last character
-echo "Address ${ADDRESS}" >> ${HOMEDIR}/output.log
+ACCOUNTS=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.account")
+ACCOUNTS=${ACCOUNTS%?}; # remove the last character
+echo "ACCOUNTS ${ACCOUNTS}" >> ${HOMEDIR}/output.log
+ACCOUNT=(${ACCOUNTS[@]});#get the first ACCOUNT from the list
+ACCOUNT=${ACCOUNT%?}; # remove the last character
+echo "ACCOUNT ${ACCOUNT}" >> ${HOMEDIR}/output.log
 
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
-echo "$(awk -v  r="${ADDRESSES}" "{gsub(/#ADDRESSES/,r)}1" genesis)" > genesis
-sed -i "s/#ADDRESS/$ADDRESS/g" $HOMEDIR/genesis || exit 1;
+echo "$(awk -v  r="${ACCOUNTS}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis
+sed -i "s/#ACCOUNT/$ACCOUNT/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
 mv $HOMEDIR/genesis $HOMEDIR/genesis.json
 
 # ###########################
+# # Init nodes
+# ###########################
+
+sudo rm -rf $PWD/node/GoChain
+docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
+
+# ###########################
 # # Generate config
 # ###########################
 
-# echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
-# ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
-# ENODES=${ENODES%?}; # remove the last character
-# sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
-# echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
-# mv $HOMEDIR/config $HOMEDIR/config.toml
+echo "console.log(admin.nodeInfo.enode);" > $HOMEDIR/node/enode.js
+ENODE_OUTPUT=$(docker run -v $PWD:/root gochain/gochain gochain --datadir /root/node js /root/node/enode.js)
+ENODE=${ENODE_OUTPUT:0:137}
+IP_ACCOUNT=$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
+sudo -H -u $AZUREUSER bash -c "echo '  \"${ENODE}${IP_ACCOUNT}:30303\",' >> ${HOMEDIR}/shared/${ACCOUNT_ID}.enode"
+echo "Enode:${ENODE}" >> ${HOMEDIR}/output.log
 
-# sudo rm -rf $PWD/node/GoChain
-# docker run --rm -v $PWD:/gochain -w /gochain gochain/gochain gochain --datadir /gochain/node init genesis.json
+wait_for_files "enode" #wait for files with extension *.enode
+
+echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
+ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
+ENODES=${ENODES%?}; # remove the last character
+sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
+echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
+mv $HOMEDIR/config $HOMEDIR/config.toml
+
 # #########################################
 # # Install docker image from private repo
 # #########################################
