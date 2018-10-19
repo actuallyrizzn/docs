@@ -122,7 +122,7 @@ echo "ACCOUNT ${ACCOUNT}" >> ${HOMEDIR}/output.log
 
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#CURRENTTSHEX/$CURRENT_TS_HEX/g" $HOMEDIR/genesis || exit 1;
-echo "$(awk -v  r="${ACCOUNTS}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis
+echo "$(awk -v  r="${ACCOUNT}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis #write only first account here
 sed -i "s/#ACCOUNT/$ACCOUNT/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
