@@ -148,7 +148,7 @@ wait_for_files "enode" #wait for files with extension *.enode
 
 echo "Generating config: $(date)" >> ${HOMEDIR}/output.log
 ENODES=$(sudo -H -u $AZUREUSER bash -c "cat ${HOMEDIR}/shared/*.enode")
-ENODES=${ENODES%?}; # remove the last character
+# ENODES=${ENODES%?}; # remove the last character
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/config || exit 1;
 echo "$(awk -v  r="${ENODES}" "{gsub(/#NODES/,r)}1" config)" > config
 mv $HOMEDIR/config $HOMEDIR/config.toml
