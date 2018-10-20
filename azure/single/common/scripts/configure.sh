@@ -3,12 +3,15 @@
 wait_for_files () {
     echo "Waiting for the files with extension ${1}: $(date)" >> ${HOMEDIR}/output.log
     COUNTER=0
-    while sleep 10 && [ "$COUNTER" -lt 60 ] #wait for no more than 10 minutes
+    while sleep 10
     do
         FILES=$(sudo -H -u $AZUREUSER bash -c "ls ${HOMEDIR}/shared/*.${1} | wc -l")
         echo "Nodes count ${NODES_COUNT} files ${FILES} counter ${COUNTER} " >> ${HOMEDIR}/output.log
         if [ "$FILES" -ge "$NODES_COUNT" ]; then
             break;
+        fi
+        if [ "$COUNTER" -ge 60 ]; then
+            exit 1;
         fi
         COUNTER=$[$COUNTER +1]
     done
