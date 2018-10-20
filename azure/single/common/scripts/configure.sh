@@ -120,10 +120,10 @@ ACCOUNTS=${ACCOUNTS%?}; # remove the last character
 echo "ACCOUNTS ${ACCOUNTS}" >> ${HOMEDIR}/output.log
 ACCOUNT=(${ACCOUNTS[@]});#get the first ACCOUNT from the list
 ACCOUNT=${ACCOUNT%?}; # remove the last character
-echo "ACCOUNT ${ACCOUNTS}" >> ${HOMEDIR}/output.log
+echo "ACCOUNT ${ACCOUNT}" >> ${HOMEDIR}/output.log
 
 sed -i "s/#NETWORKID/$NETWORK_ID/g" $HOMEDIR/genesis || exit 1;
-echo "$(awk -v  r="${ACCOUNT}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis #write only first account here
+echo "$(awk -v  r="${ACCOUNTS}" "{gsub(/#ACCOUNTS/,r)}1" genesis)" > genesis #write only first account here
 sed -i "s/#ACCOUNT/$ACCOUNT/g" $HOMEDIR/genesis || exit 1;
 sed -i "s/#HEX/$INITIAL_BALANCE_HEX/g" $HOMEDIR/genesis || exit 1;
 
